@@ -59,9 +59,9 @@ func main() {
 	defaultConfig.ProxyRotator = libproxyrotator.DefaultConfig
 	defaultConfig.Inject = libinject.DefaultConfig
 	defaultConfig.Inject.Type = 3
-	defaultConfig.Inject.Proxies = map[string][]string{
-		"www.pubgmobile.com:80": []string{
-			"akamai.net:80",
+	defaultConfig.Inject.Rules = map[string][]string{
+		"akamai.net:80": []string{
+			"www.pubgmobile.com:80",
 		},
 	}
 	defaultConfig.Inject.ProxyPayload = ""
