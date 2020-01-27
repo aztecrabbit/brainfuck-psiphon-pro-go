@@ -4,7 +4,6 @@ import (
 	"os"
 	"os/exec"
 	"fmt"
-	"sync"
 	"time"
 	"bufio"
 	"strconv"
@@ -31,7 +30,7 @@ var (
 		KuotaDataLimit: 4,
 		Authorizations: make([]string, 0),
 	}
-	KuotaDataDefault = &KuotaData{
+	DefaultKuotaData = &KuotaData{
 		Port: make(map[int]map[string]float64),
 		All: 0,
 	}
@@ -83,7 +82,9 @@ type Psiphon struct {
 }
 
 func (p *Psiphon) LogInfo(message string, color string) {
-	liblog.LogInfo(message, strconv.Itoa(p.ListenPort), color)
+	if Loop {
+		liblog.LogInfo(message, strconv.Itoa(p.ListenPort), color)
+	}
 }
 
 func (p *Psiphon) GetAuthorizations() []string {
@@ -106,9 +107,7 @@ func (p *Psiphon) CheckKuotaDataLimit(sent float64, received float64) bool {
 	return true
 }
 
-func (p *Psiphon) Start(wg *sync.WaitGroup, proxyrotator *libproxyrotator.ProxyRotator) {
-	defer wg.Done()
-
+func (p *Psiphon) Start(proxyrotator *libproxyrotator.ProxyRotator) {
 	PsiphonData := &Data{
 		UpstreamProxyURL: "http://127.0.0.1:" + p.ProxyPort,
 		DataStoreDirectory: PsiphonDirectory + "/data/" + strconv.Itoa(p.ListenPort),

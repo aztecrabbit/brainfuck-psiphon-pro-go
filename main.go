@@ -3,7 +3,6 @@ package main
 import (
 	"os"
 	"fmt"
-	"sync"
 	"time"
 
 	"github.com/aztecrabbit/liblog"
@@ -17,13 +16,14 @@ import (
 const (
 	appName = "Brainfuck Tunnel"
 	appVersionName = "Psiphon Pro Go"
-	appVersionCode = "200125"
+	appVersionCode = "200127"
 
 	copyrightYear = "2020"
 	copyrightAuthor = "Aztec Rabbit"
 )
 
 var (
+	InterruptHandler = new(libutils.InterruptHandler)
 	Redsocks = new(libredsocks.Redsocks)
 )
 
@@ -35,12 +35,10 @@ type Config struct {
 }
 
 func init() {
-	InterruptHandler := &libutils.InterruptHandler{
-		Handle: func() {
-			libpsiphon.Stop()
-			libredsocks.Stop(Redsocks)
-			liblog.LogKeyboardInterrupt()
-		},
+	InterruptHandler.Handle = func() {
+		libredsocks.Stop(Redsocks)
+		libpsiphon.Stop()
+		liblog.LogKeyboardInterrupt()
 	}
 	InterruptHandler.Start()
 }
@@ -61,7 +59,14 @@ func main() {
 	defaultConfig.Inject.Type = 3
 	defaultConfig.Inject.Rules = map[string][]string{
 		"akamai.net:80": []string{
-			"www.pubgmobile.com:80",
+			"video.iflix.com",
+			"videocdn-2.iflix.com",
+			"iflix-videocdn-p1.akamaized.net",
+			"iflix-videocdn-p2.akamaized.net",
+			"iflix-videocdn-p3.akamaized.net",
+			"iflix-videocdn-p6.akamaized.net",
+			"iflix-videocdn-p7.akamaized.net",
+			"iflix-videocdn-p8.akamaized.net",
 		},
 	}
 	defaultConfig.Inject.ProxyPayload = ""
@@ -75,8 +80,8 @@ func main() {
 	ProxyRotator.Config = config.ProxyRotator
 
 	Inject := new(libinject.Inject)
-	Inject.Config = config.Inject
 	Inject.Redsocks = Redsocks
+	Inject.Config = config.Inject
 
 	go ProxyRotator.Start()
 	go Inject.Start()
@@ -98,26 +103,18 @@ func main() {
 		return
 	}
 
-	// Defined on global variables
 	Redsocks.Config = libredsocks.DefaultConfig
-	if Redsocks.CheckIsEnabled() {
-		liblog.LogInfo("Redsocks started", "INFO", liblog.Colors["G1"])
-	}
 	Redsocks.Start()
 
-	var wg sync.WaitGroup
-
 	for i := 1; i <= config.PsiphonCore; i++ {
-		wg.Add(1)
-
 		Psiphon := new(libpsiphon.Psiphon)
 		Psiphon.Config = config.Psiphon
 		Psiphon.ProxyPort = Inject.Config.Port
-		Psiphon.KuotaData = libpsiphon.KuotaDataDefault
+		Psiphon.KuotaData = libpsiphon.DefaultKuotaData
 		Psiphon.ListenPort = libutils.Atoi(ProxyRotator.Config.Port) + i
 
-		go Psiphon.Start(&wg, ProxyRotator)
+		go Psiphon.Start(ProxyRotator)
 	}
 
-	wg.Wait()
+	InterruptHandler.Wait()
 }
