@@ -64,7 +64,7 @@ Configurations
 Run `./brainfuck-psiphon-pro-go` first to export all default settings.
 
 
-#### Pro Version
+### Pro Version
 
     ...
     "PsiphonCore": 1,
@@ -85,7 +85,7 @@ Run `./brainfuck-psiphon-pro-go` first to export all default settings.
     ...
 
 
-#### Rules
+### Rules
 
 **Xl Iflix or Axis Gaming (Default)**
 

@@ -21,13 +21,13 @@ var (
 	DefaultConfig = &Config{
 		CoreName: "psiphon-tunnel-core",
 		Tunnel: 1,
-		Region: "",
+		Region: "SG",
 		Protocols: []string{
 			"FRONTED-MEEK-HTTP-OSSH",
 			"FRONTED-MEEK-OSSH",
 		},
 		TunnelWorkers: 8,
-		KuotaDataLimit: 4,
+		KuotaDataLimit: 4000000,
 		Authorizations: make([]string, 0),
 	}
 	DefaultKuotaData = &KuotaData{
@@ -100,8 +100,8 @@ func (p *Psiphon) GetAuthorizations() []string {
 }
 
 func (p *Psiphon) CheckKuotaDataLimit(sent float64, received float64) bool {
-	if p.Config.KuotaDataLimit != 0 && int(p.KuotaData.Port[p.ListenPort]["all"]) >= (p.Config.KuotaDataLimit * 1048576) &&
-			int(sent) == 0 && int(received) <= 20000 {
+	if p.Config.KuotaDataLimit != 0 && int(p.KuotaData.Port[p.ListenPort]["all"]) >= p.Config.KuotaDataLimit &&
+			int(sent) == 0 && int(received) <= 64000 {
 		return false
 	}
 
