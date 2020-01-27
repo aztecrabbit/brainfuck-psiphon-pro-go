@@ -108,12 +108,13 @@ func main() {
 
 	for i := 1; i <= config.PsiphonCore; i++ {
 		Psiphon := new(libpsiphon.Psiphon)
+		Psiphon.ProxyRotator = ProxyRotator
 		Psiphon.Config = config.Psiphon
 		Psiphon.ProxyPort = Inject.Config.Port
 		Psiphon.KuotaData = libpsiphon.DefaultKuotaData
 		Psiphon.ListenPort = libutils.Atoi(ProxyRotator.Config.Port) + i
 
-		go Psiphon.Start(ProxyRotator)
+		go Psiphon.Start()
 	}
 
 	InterruptHandler.Wait()

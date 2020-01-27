@@ -74,6 +74,7 @@ type Data struct {
 }
 
 type Psiphon struct {
+	ProxyRotator *libproxyrotator.ProxyRotator
 	Config *Config
 	ProxyPort string
 	KuotaData *KuotaData
@@ -107,7 +108,7 @@ func (p *Psiphon) CheckKuotaDataLimit(sent float64, received float64) bool {
 	return true
 }
 
-func (p *Psiphon) Start(proxyrotator *libproxyrotator.ProxyRotator) {
+func (p *Psiphon) Start() {
 	PsiphonData := &Data{
 		UpstreamProxyURL: "http://127.0.0.1:" + p.ProxyPort,
 		DataStoreDirectory: PsiphonDirectory + "/data/" + strconv.Itoa(p.ListenPort),
@@ -182,7 +183,7 @@ func (p *Psiphon) Start(proxyrotator *libproxyrotator.ProxyRotator) {
 					)
 
 				} else if noticeType == "ActiveTunnel" {
-					proxyrotator.Proxies = append(proxyrotator.Proxies, "0.0.0.0:" + strconv.Itoa(p.ListenPort))
+					p.ProxyRotator.Proxies = append(p.ProxyRotator.Proxies, "0.0.0.0:" + strconv.Itoa(p.ListenPort))
 					p.TunnelConnected++
 					if p.Config.Tunnel > 1 {
 						diagnosticId := line["data"].(map[string]interface{})["diagnosticID"].(string)
@@ -254,7 +255,7 @@ func (p *Psiphon) Start(proxyrotator *libproxyrotator.ProxyRotator) {
 		command.Start()
 		command.Wait()
 
-		proxyrotator.DeleteProxy("0.0.0.0:" + strconv.Itoa(p.ListenPort))
+		p.ProxyRotator.DeleteProxy("0.0.0.0:" + strconv.Itoa(p.ListenPort))
 
 		time.Sleep(200 * time.Millisecond)
 
