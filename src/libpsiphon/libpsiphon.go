@@ -26,7 +26,7 @@ var (
 			"FRONTED-MEEK-HTTP-OSSH",
 			"FRONTED-MEEK-OSSH",
 		},
-		TunnelWorkers: 8,
+		TunnelWorkers: 4,
 		KuotaDataLimit: 4000000,
 		Authorizations: make([]string, 0),
 	}
@@ -58,19 +58,19 @@ type KuotaData struct {
 }
 
 type Data struct {
-    UpstreamProxyURL string
-    DataStoreDirectory string
-    LocalSocksProxyPort int
-    SponsorId string
-    PropagationChannelId string
-    EmitBytesTransferred bool
-    EmitDiagnosticNotices bool
-    DisableLocalHTTPProxy bool
-    EgressRegion string
-    TunnelPoolSize int
-    ConnectionWorkerPoolSize int
-    LimitTunnelProtocols []string
-    Authorizations []string
+	UpstreamProxyURL string
+	DataStoreDirectory string
+	LocalSocksProxyPort int
+	SponsorId string
+	PropagationChannelId string
+	EmitBytesTransferred bool
+	EmitDiagnosticNotices bool
+	DisableLocalHTTPProxy bool
+	EgressRegion string
+	TunnelPoolSize int
+	ConnectionWorkerPoolSize int
+	LimitTunnelProtocols []string
+	Authorizations []string
 }
 
 type Psiphon struct {
@@ -183,7 +183,7 @@ func (p *Psiphon) Start() {
 					)
 
 				} else if noticeType == "ActiveTunnel" {
-					p.ProxyRotator.Proxies = append(p.ProxyRotator.Proxies, "0.0.0.0:" + strconv.Itoa(p.ListenPort))
+					p.ProxyRotator.AddProxy("0.0.0.0:" + strconv.Itoa(p.ListenPort))
 					p.TunnelConnected++
 					if p.Config.Tunnel > 1 {
 						diagnosticId := line["data"].(map[string]interface{})["diagnosticID"].(string)
