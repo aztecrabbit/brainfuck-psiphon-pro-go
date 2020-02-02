@@ -63,8 +63,8 @@ Run `./brainfuck-psiphon-pro-go` first to export all default settings.
     "PsiphonCore": 1,
     "Psiphon": {
         "CoreName": "psiphon-tunnel-core",
-        "Tunnel": 3,
-        "Region": "SG",
+        "Tunnel": 4,
+        "Region": "",
         "Protocols": [
             "FRONTED-MEEK-HTTP-OSSH",
             "FRONTED-MEEK-OSSH"
