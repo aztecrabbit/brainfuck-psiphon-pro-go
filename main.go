@@ -38,8 +38,8 @@ type Config struct {
 
 func init() {
 	InterruptHandler.Handle = func() {
-		libredsocks.Stop(Redsocks)
 		libpsiphon.Stop()
+		libredsocks.Stop(Redsocks)
 		liblog.LogKeyboardInterrupt()
 	}
 	InterruptHandler.Start()
@@ -78,17 +78,23 @@ func main() {
 
 	libutils.JsonReadWrite(libutils.RealPath("config.json"), config, defaultConfig)
 
+	var flagPro = true
 	var flagFrontend string
 	var flagWhitelist string
 
-	flag.StringVar(&flagFrontend, "f", flagFrontend, "-f bug.com,bug.com:443")
-	flag.StringVar(&flagWhitelist, "w", flagWhitelist, "-w akamai.net:80")
-	flag.IntVar(&config.PsiphonCore, "c", config.PsiphonCore, "-c core (e.g. -c 4) (1 for pro version)")
+	flag.BoolVar(&flagPro, "pro", flagPro, "Pro Version?")
+	flag.StringVar(&flagFrontend, "f", flagFrontend, "-f frontend-domains (e.g. -f cdn.com,cdn.com:443)")
+	flag.StringVar(&flagWhitelist, "w", flagWhitelist, "-w whitelist-request (e.g. -w akamai.net:80)")
+	flag.IntVar(&config.PsiphonCore, "c", config.PsiphonCore, "-c core (e.g. -c 4) (1 for Pro Version)")
 	flag.StringVar(&config.Psiphon.Region, "r", config.Psiphon.Region, "-r region (e.g. -r sg)")
-	flag.IntVar(&config.Psiphon.Tunnel, "t", config.Psiphon.Tunnel, "-t tunnel (e.g. -t 4) (1 for reconnect version)")
-	flag.IntVar(&config.Psiphon.TunnelWorkers, "tw", config.Psiphon.TunnelWorkers, "-tw tunnel-workers (e.g. -tw 4) (8 for pro version)")
-	flag.IntVar(&config.Psiphon.KuotaDataLimit, "l", config.Psiphon.KuotaDataLimit, "-l limit (in Bytes) (e.g. -l 4000000) (4 MB) (0 for pro version (unlimited))")
+	flag.IntVar(&config.Psiphon.Tunnel, "t", config.Psiphon.Tunnel, "-t tunnel (e.g. -t 4) (1 for Reconnect Version)")
+	flag.IntVar(&config.Psiphon.TunnelWorkers, "tw", config.Psiphon.TunnelWorkers, "-tw tunnel-workers (e.g. -tw 6) (8 for Pro Version)")
+	flag.IntVar(&config.Psiphon.KuotaDataLimit, "l", config.Psiphon.KuotaDataLimit, "-l limit (in MB) (e.g. -l 4) (0 for Pro Version (unlimited))")
 	flag.Parse()
+
+	if !flagPro {
+		config.Psiphon.Authorizations = make([]string, 0)
+	}
 
 	if flagFrontend != "" || flagWhitelist != "" {
 		if flagFrontend == "" {

@@ -26,8 +26,8 @@ var (
 			"FRONTED-MEEK-HTTP-OSSH",
 			"FRONTED-MEEK-OSSH",
 		},
-		TunnelWorkers: 4,
-		KuotaDataLimit: 4000000,
+		TunnelWorkers: 6,
+		KuotaDataLimit: 4,
 		Authorizations: make([]string, 0),
 	}
 	DefaultKuotaData = &KuotaData{
@@ -100,7 +100,7 @@ func (p *Psiphon) GetAuthorizations() []string {
 }
 
 func (p *Psiphon) CheckKuotaDataLimit(sent float64, received float64) bool {
-	if p.Config.KuotaDataLimit != 0 && int(p.KuotaData.Port[p.ListenPort]["all"]) >= p.Config.KuotaDataLimit &&
+	if p.Config.KuotaDataLimit != 0 && int(p.KuotaData.Port[p.ListenPort]["all"]) >= (p.Config.KuotaDataLimit * 1000000) &&
 			int(sent) == 0 && int(received) <= 64000 {
 		return false
 	}

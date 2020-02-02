@@ -2,9 +2,8 @@
 *.ori
 *.bak
 *.conf
+*.json
 *.backup
-
-config.json
 
 app
 psiphon-tunnel-core
