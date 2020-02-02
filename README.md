@@ -16,6 +16,10 @@ Requirements
     golang
     proxifier
 
+**Android (Termux)**
+
+    golang
+
 
 Install
 -------
@@ -23,16 +27,12 @@ Install
 **Brainfuck Psiphon Pro Go**
 
     $ go get -v -u github.com/aztecrabbit/brainfuck-psiphon-pro-go
-
     $ cd ~/go/src/github.com/aztecrabbit/brainfuck-psiphon-pro-go
     $ go build -ldflags "-s -w"
 
 **Psiphon Tunnel Core**
 
-    $ go get -v -u github.com/Psiphon-Labs/psiphon-tunnel-core/ConsoleClient
-
-    $ cd ~/go/src/github.com/Psiphon-Labs/psiphon-tunnel-core/ConsoleClient
-    $ go build -ldflags "-s -w" -o ~/go/src/github.com/aztecrabbit/brainfuck-psiphon-pro-go/psiphon-tunnel-core
+    https://github.com/aztecrabbit/Brainfuck-Psiphon-Pro/tree/master/storage/psiphon/.tunnel-core
 
 
 Usage
@@ -41,21 +41,14 @@ Usage
 **Linux**
 
     $ cd ~/go/src/github.com/aztecrabbit/brainfuck-psiphon-pro-go
-    $ sudo ./brainfuck-psiphon-pro-go
-
-or
-
-    $ sudo ~/go/src/github.com/aztecrabbit/brainfuck-psiphon-pro-go/brainfuck-psiphon-pro-go
+    $ sudo -s
+    # ./brainfuck-psiphon-pro-go
 
 
-**Termux**
+**Android (Termux)**
 
     $ cd ~/go/src/github.com/aztecrabbit/brainfuck-psiphon-pro-go
     $ ./brainfuck-psiphon-pro-go
-
-or
-
-    $ ~/go/src/github.com/aztecrabbit/brainfuck-psiphon-pro-go/brainfuck-psiphon-pro-go
 
 
 Configurations
@@ -114,6 +107,10 @@ Run `./brainfuck-psiphon-pro-go` first to export all default settings.
     },
     ...
 
+or
+
+    ./brainfuck-psiphon-pro-go -f "*" -w "*:*"
+
 **Xl King**
 
     ...
@@ -123,6 +120,10 @@ Run `./brainfuck-psiphon-pro-go` first to export all default settings.
         ]
     },
     ...
+
+or
+
+    ./brainfuck-psiphon-pro-go -f "www.pubgmobile.com" -w "akamai.net:80"
 
 **Telkomsel 0P0K**
 
@@ -134,3 +135,7 @@ Run `./brainfuck-psiphon-pro-go` first to export all default settings.
         ]
     },
     ...
+
+or
+
+    ./brainfuck-psiphon-pro-go -f "118.97.159.51:443,118.98.95.106:443" -w "akamai.net:443"
