@@ -21,7 +21,7 @@ var (
 	DefaultConfig = &Config{
 		CoreName: "psiphon-tunnel-core",
 		Tunnel: 1,
-		Region: "SG",
+		Region: "",
 		Protocols: []string{
 			"FRONTED-MEEK-HTTP-OSSH",
 			"FRONTED-MEEK-OSSH",
