@@ -58,8 +58,8 @@ type KuotaData struct {
 }
 
 type Data struct {
+	MigrateDataStoreDirectory string
 	UpstreamProxyURL string
-	DataStoreDirectory string
 	LocalSocksProxyPort int
 	SponsorId string
 	PropagationChannelId string
@@ -110,8 +110,8 @@ func (p *Psiphon) CheckKuotaDataLimit(sent float64, received float64) bool {
 
 func (p *Psiphon) Start() {
 	PsiphonData := &Data{
+		MigrateDataStoreDirectory: PsiphonDirectory + "/data/" + strconv.Itoa(p.ListenPort),
 		UpstreamProxyURL: "http://127.0.0.1:" + p.ProxyPort,
-		DataStoreDirectory: PsiphonDirectory + "/data/" + strconv.Itoa(p.ListenPort),
 		LocalSocksProxyPort: p.ListenPort,
 		SponsorId: "0000000000000000",
 		PropagationChannelId: "0000000000000000",
@@ -125,11 +125,10 @@ func (p *Psiphon) Start() {
 		Authorizations: p.GetAuthorizations(),
 	}
 
-	libutils.JsonWrite(PsiphonData, PsiphonData.DataStoreDirectory + "/config.json")
+	libutils.JsonWrite(PsiphonData, PsiphonData.MigrateDataStoreDirectory + "/config.json")
 	libutils.CopyFile(
 		PsiphonDirectory + "/database/psiphon.boltdb",
-		PsiphonData.DataStoreDirectory + "/psiphon.boltdb",
-		0666,
+		PsiphonData.MigrateDataStoreDirectory + "/psiphon.boltdb",
 	)
 
 	p.LogInfo("Connecting", liblog.Colors["G1"])
@@ -140,8 +139,9 @@ func (p *Psiphon) Start() {
 		p.TunnelConnected = 0
 
 		command := exec.Command(
-			libutils.RealPath(p.Config.CoreName), "-config", PsiphonData.DataStoreDirectory + "/config.json",
+			libutils.RealPath(p.Config.CoreName), "-config", PsiphonData.MigrateDataStoreDirectory + "/config.json",
 		)
+		command.Dir = PsiphonData.MigrateDataStoreDirectory
 
 		stderr, err := command.StderrPipe()
 		if err != nil {
@@ -196,14 +196,19 @@ func (p *Psiphon) Start() {
 				} else if noticeType == "Alert" {
 					message := line["data"].(map[string]interface{})["message"].(string)
 
-					if strings.Contains(message, "meek round trip failed") {
+					if strings.HasPrefix(message, "Config migration:") {
+						continue
+					} else if strings.Contains(message, "meek round trip failed") {
 						if p.TunnelConnected == p.Config.Tunnel && (
 								message == "meek round trip failed: remote error: tls: bad record MAC" ||
 								message == "meek round trip failed: context deadline exceeded" ||
 								message == "meek round trip failed: EOF" ||
 								strings.Contains(message, "psiphon.CustomTLSDial")) {
-							// p.LogInfo(message, liblog.Colors["R1"])
-							break
+							if p.Config.Tunnel == 1 {
+								// p.LogInfo(message, liblog.Colors["R1"])
+								break
+							}
+							p.LogInfo(message, liblog.Colors["R2"])
 						}
 					} else if strings.Contains(message, "controller shutdown due to component failure") ||
 							strings.Contains(message, "psiphon.(*ServerContext).DoStatusRequest") ||
@@ -212,8 +217,11 @@ func (p *Psiphon) Start() {
 							strings.Contains(message, "underlying conn is closed") ||
 							strings.Contains(message, "duplicate tunnel:") ||
 							strings.Contains(message, "tunnel failed:") {
-						// p.LogInfo("Break: " + text, liblog.Colors["R1"])
-						break
+						if p.Config.Tunnel == 1 {
+							// p.LogInfo("Break: " + text, liblog.Colors["R1"])
+							break
+						}
+						p.LogInfo(text, liblog.Colors["R2"])
 					} else if strings.Contains(message, "A connection attempt failed because the connected party did not properly respond after a period of time") ||
 							strings.Contains(message, "No connection could be made because the target machine actively refused it") ||
 							strings.Contains(message, "tunnel.dialTunnel: dialConn is not a Closer") ||

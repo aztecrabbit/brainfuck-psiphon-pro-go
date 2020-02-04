@@ -58,7 +58,7 @@ func main() {
 	defaultConfig := new(Config)
 	defaultConfig.ProxyRotator = libproxyrotator.DefaultConfig
 	defaultConfig.Inject = libinject.DefaultConfig
-	defaultConfig.Inject.Type = 3
+	defaultConfig.Inject.Type = 2
 	defaultConfig.Inject.Rules = map[string][]string{
 		"akamai.net:80": []string{
 			"video.iflix.com",
@@ -71,8 +71,8 @@ func main() {
 			"iflix-videocdn-p8.akamaized.net",
 		},
 	}
-	defaultConfig.Inject.ProxyPayload = ""
-	defaultConfig.Inject.ProxyTimeout = 5
+	defaultConfig.Inject.Payload = ""
+	defaultConfig.Inject.Timeout = 5
 	defaultConfig.PsiphonCore = 4
 	defaultConfig.Psiphon = libpsiphon.DefaultConfig
 
