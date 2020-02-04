@@ -32,7 +32,9 @@ Install
 
 **Psiphon Tunnel Core**
 
-    https://github.com/aztecrabbit/Brainfuck-Psiphon-Pro/tree/master/storage/psiphon/.tunnel-core
+    $ go get -v -u github.com/Psiphon-Labs/psiphon-tunnel-core
+    $ cd ~/go/src/github.com/Psiphon-Labs/psiphon-tunnel-core/ConsoleClient
+    $ go build -ldflags "-s -w" -o ~/go/src/github.com/aztecrabbit/brainfuck-psiphon-pro-go/psiphon-tunnel-core
 
 
 Usage
