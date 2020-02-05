@@ -6,6 +6,7 @@ import (
 	"time"
 	"flag"
 	"strings"
+	"runtime"
 
 	"github.com/aztecrabbit/liblog"
 	"github.com/aztecrabbit/libutils"
@@ -75,6 +76,10 @@ func main() {
 	defaultConfig.Inject.Timeout = 5
 	defaultConfig.PsiphonCore = 4
 	defaultConfig.Psiphon = libpsiphon.DefaultConfig
+
+	if runtime.GOOS == "windows" {
+		defaultConfig.Psiphon.CoreName += ".exe"
+	}
 
 	libutils.JsonReadWrite(libutils.RealPath("config.json"), config, defaultConfig)
 

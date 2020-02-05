@@ -8,7 +8,6 @@ import (
 	"bufio"
 	"strconv"
 	"strings"
-	"syscall"
 	"encoding/json"
 
 	"github.com/aztecrabbit/liblog"
@@ -250,7 +249,7 @@ func (p *Psiphon) Start() {
 				}
 			}
 
-			command.Process.Signal(syscall.SIGTERM)
+			libutils.KillProcess(command.Process)
 		}()
 
 		command.Start()
