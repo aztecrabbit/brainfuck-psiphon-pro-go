@@ -199,16 +199,12 @@ func (p *Psiphon) Start() {
 					if strings.HasPrefix(message, "Config migration:") {
 						continue
 					} else if strings.Contains(message, "meek round trip failed") {
-						if p.TunnelConnected == p.Config.Tunnel && (
+						if p.Config.Tunnel == 1 && p.Config.Tunnel == p.TunnelConnected && (
 								message == "meek round trip failed: remote error: tls: bad record MAC" ||
 								message == "meek round trip failed: context deadline exceeded" ||
 								message == "meek round trip failed: EOF" ||
 								strings.Contains(message, "psiphon.CustomTLSDial")) {
-							if p.Config.Tunnel == 1 {
-								// p.LogInfo(message, liblog.Colors["R1"])
-								break
-							}
-							p.LogInfo(message, liblog.Colors["R2"])
+							break
 						}
 					} else if strings.Contains(message, "controller shutdown due to component failure") ||
 							strings.Contains(message, "psiphon.(*ServerContext).DoStatusRequest") ||
@@ -217,11 +213,8 @@ func (p *Psiphon) Start() {
 							strings.Contains(message, "underlying conn is closed") ||
 							strings.Contains(message, "duplicate tunnel:") ||
 							strings.Contains(message, "tunnel failed:") {
-						if p.Config.Tunnel == 1 {
-							// p.LogInfo("Break: " + text, liblog.Colors["R1"])
-							break
-						}
-						p.LogInfo(text, liblog.Colors["R2"])
+						// p.LogInfo("Break: " + text, liblog.Colors["R1"])
+						break
 					} else if strings.Contains(message, "A connection attempt failed because the connected party did not properly respond after a period of time") ||
 							strings.Contains(message, "No connection could be made because the target machine actively refused it") ||
 							strings.Contains(message, "tunnel.dialTunnel: dialConn is not a Closer") ||
