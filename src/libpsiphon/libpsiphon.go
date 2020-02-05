@@ -38,6 +38,9 @@ var (
 
 func Stop() {
 	Loop = false
+}
+
+func RemoveData() {
 	os.RemoveAll(PsiphonDirectory + "/data")
 }
 
@@ -125,10 +128,13 @@ func (p *Psiphon) Start() {
 	}
 
 	libutils.JsonWrite(PsiphonData, PsiphonData.MigrateDataStoreDirectory + "/config.json")
-	libutils.CopyFile(
-		PsiphonDirectory + "/database/psiphon.boltdb",
-		PsiphonData.MigrateDataStoreDirectory + "/psiphon.boltdb",
-	)
+
+	PsiphonFileBoltdb := PsiphonData.MigrateDataStoreDirectory + "/ca.psiphon.PsiphonTunnel.tunnel-core/datastore/psiphon.boltdb"
+	if _, err := os.Stat(PsiphonFileBoltdb); os.IsNotExist(err) {
+		libutils.CopyFile(
+			PsiphonDirectory + "/database/psiphon.boltdb", PsiphonFileBoltdb,
+		)
+	}
 
 	p.LogInfo("Connecting", liblog.Colors["G1"])
 

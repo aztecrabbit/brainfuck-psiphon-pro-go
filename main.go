@@ -84,10 +84,12 @@ func main() {
 	libutils.JsonReadWrite(libutils.RealPath("config.json"), config, defaultConfig)
 
 	var flagPro = true
+	var flagRefresh = false
 	var flagFrontend string
 	var flagWhitelist string
 
 	flag.BoolVar(&flagPro, "pro", flagPro, "Pro Version?")
+	flag.BoolVar(&flagRefresh, "refresh", flagRefresh, "Refresh Data")
 	flag.StringVar(&flagFrontend, "f", flagFrontend, "-f frontend-domains (e.g. -f cdn.com,cdn.com:443)")
 	flag.StringVar(&flagWhitelist, "w", flagWhitelist, "-w whitelist-request (e.g. -w akamai.net:80)")
 	flag.IntVar(&config.PsiphonCore, "c", config.PsiphonCore, "-c core (e.g. -c 4) (1 for Pro Version)")
@@ -99,6 +101,10 @@ func main() {
 
 	if !flagPro {
 		config.Psiphon.Authorizations = make([]string, 0)
+	}
+
+	if flagRefresh {
+		libpsiphon.RemoveData()
 	}
 
 	if flagFrontend != "" || flagWhitelist != "" {
