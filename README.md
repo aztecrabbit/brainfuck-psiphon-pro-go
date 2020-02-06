@@ -8,6 +8,7 @@ Requirements
 
 **Linux**
 
+    git
     golang
     redsocks
 
@@ -18,6 +19,7 @@ Requirements
 
 **Android (Termux)**
 
+    git
     golang
 
 
@@ -32,7 +34,7 @@ Install
 
 **Psiphon Tunnel Core**
 
-    $ go get -v -u github.com/Psiphon-Labs/psiphon-tunnel-core
+    $ go get -v -u github.com/Psiphon-Labs/psiphon-tunnel-core/ConsoleClient
     $ cd ~/go/src/github.com/Psiphon-Labs/psiphon-tunnel-core/ConsoleClient
     $ go build -ldflags "-s -w" -o ~/go/src/github.com/aztecrabbit/brainfuck-psiphon-pro-go/psiphon-tunnel-core
 
