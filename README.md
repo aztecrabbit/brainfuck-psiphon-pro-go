@@ -45,7 +45,7 @@ Usage
 **Linux**
 
     $ cd ~/go/src/github.com/aztecrabbit/brainfuck-psiphon-pro-go
-    $ sudo -s
+    $ sudo --preserve-env -s
     # ./brainfuck-psiphon-pro-go
 
 
@@ -127,7 +127,7 @@ or
 
 or
 
-    ./brainfuck-psiphon-pro-go -f "www.pubgmobile.com" -w "akamai.net:80"
+    ./brainfuck-psiphon-pro-go -f www.pubgmobile.com -w akamai.net:80
 
 **Telkomsel 0P0K**
 
@@ -142,4 +142,19 @@ or
 
 or
 
-    ./brainfuck-psiphon-pro-go -f "118.97.159.51:443,118.98.95.106:443" -w "akamai.net:443"
+    ./brainfuck-psiphon-pro-go -f 118.97.159.51:443,118.98.95.106:443 -w akamai.net:443
+
+**Ruang Guru and Udemmy (XL or Axis)**
+
+    ...
+    "Rules": {
+        "akamai.net:80": [
+            "*"
+        ],
+        "fastly.net:80": [
+            "c.shared.global.fastly.net",
+            "rg-video.ruangguru.com"
+        ]
+    },
+    ...
+
