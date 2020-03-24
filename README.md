@@ -54,11 +54,17 @@ Usage
     $ cd ~/go/src/github.com/aztecrabbit/brainfuck-psiphon-pro-go
     $ ./brainfuck-psiphon-pro-go
 
+<!-- -->
+
+    Use ProxyDroid (root), Tun2Tap, or SocksDroid to redirect all connection to this Tunnel (Socks 5 Port 3080)
+    Exclude Termux!
+
 
 Configurations
 --------------
 
 Run `./brainfuck-psiphon-pro-go` first to export all default settings.
+Config will generated to `config.json` where brainfuck-psiphon-pro-go binary file are executed.
 
 
 ### Pro Version
@@ -84,7 +90,7 @@ Run `./brainfuck-psiphon-pro-go` first to export all default settings.
 
 ### Rules
 
-**Xl Iflix or Axis Gaming (Default)**
+**XL Iflix or Axis Gaming (Default)**
 
     ...
     "Rules": {
@@ -115,20 +121,6 @@ or
 
     ./brainfuck-psiphon-pro-go -f "*" -w "*:*"
 
-**Xl King**
-
-    ...
-    "Rules": {
-        "akamai.net:80": [
-            "www.pubgmobile.com"
-        ]
-    },
-    ...
-
-or
-
-    ./brainfuck-psiphon-pro-go -f www.pubgmobile.com -w akamai.net:80
-
 **Telkomsel 0P0K**
 
     ...
@@ -143,6 +135,37 @@ or
 or
 
     ./brainfuck-psiphon-pro-go -f 118.97.159.51:443,118.98.95.106:443 -w akamai.net:443
+
+**XL King**
+
+    ...
+    "Rules": {
+        "akamai.net:80": [
+            "ak-quic.stream.music.joox.com.edgesuite.net",
+            "ak-hk.stream.music.joox.com.edgesuite.net",
+            "ak-ng.stream.music.joox.com.edgesuite.net",
+            "ak-quic.app.joox.com.edgesuite.net",
+            "ak-ng.app.joox.com.edgesuite.net",
+            "e5121.b.akamaiedge.net",
+            "www.pubgmobile.com"
+        ]
+    },
+    ...
+
+**Joox**
+
+    ...
+    "Rules": {
+        "akamai.net:80": [
+            "ak-quic.stream.music.joox.com.edgesuite.net",
+            "ak-hk.stream.music.joox.com.edgesuite.net",
+            "ak-ng.stream.music.joox.com.edgesuite.net",
+            "ak-quic.app.joox.com.edgesuite.net",
+            "ak-ng.app.joox.com.edgesuite.net",
+            "e5121.b.akamaiedge.net"
+        ]
+    },
+    ...
 
 **Ruang Guru and Udemmy (XL or Axis)**
 
