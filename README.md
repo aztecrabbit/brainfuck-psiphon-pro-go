@@ -28,13 +28,13 @@ Install
 
 **Brainfuck Psiphon Pro Go**
 
-    $ go get -v -u github.com/aztecrabbit/brainfuck-psiphon-pro-go
+    $ go get -v -u -d github.com/aztecrabbit/brainfuck-psiphon-pro-go
     $ cd ~/go/src/github.com/aztecrabbit/brainfuck-psiphon-pro-go
     $ go build -ldflags "-s -w"
 
 **Psiphon Tunnel Core**
 
-    $ go get -v -u github.com/Psiphon-Labs/psiphon-tunnel-core/ConsoleClient
+    $ go get -v -u -d github.com/Psiphon-Labs/psiphon-tunnel-core/ConsoleClient
     $ cd ~/go/src/github.com/Psiphon-Labs/psiphon-tunnel-core/ConsoleClient
     $ go build -ldflags "-s -w" -o ~/go/src/github.com/aztecrabbit/brainfuck-psiphon-pro-go/psiphon-tunnel-core
 
@@ -64,7 +64,7 @@ Configurations
 --------------
 
 Run `./brainfuck-psiphon-pro-go` first to export all default settings.
-Config will generated to `config.json` where brainfuck-psiphon-pro-go binary file are executed.
+Config will generated to `config.json` where `brainfuck-psiphon-pro-go` binary file are executed.
 
 
 ### Pro Version
@@ -136,23 +136,17 @@ or
 
     ./brainfuck-psiphon-pro-go -f 118.97.159.51:443,118.98.95.106:443 -w akamai.net:443
 
-**XL King**
+**Pubg Mobile (XL King)**
 
     ...
     "Rules": {
         "akamai.net:80": [
-            "ak-quic.stream.music.joox.com.edgesuite.net",
-            "ak-hk.stream.music.joox.com.edgesuite.net",
-            "ak-ng.stream.music.joox.com.edgesuite.net",
-            "ak-quic.app.joox.com.edgesuite.net",
-            "ak-ng.app.joox.com.edgesuite.net",
-            "e5121.b.akamaiedge.net",
             "www.pubgmobile.com"
         ]
     },
     ...
 
-**Joox**
+**Joox (XL King)**
 
     ...
     "Rules": {
@@ -171,13 +165,20 @@ or
 
     ...
     "Rules": {
-        "akamai.net:80": [
-            "*"
-        ],
-        "fastly.net:80": [
-            "c.shared.global.fastly.net",
-            "rg-video.ruangguru.com"
+        "fastly.net:443": [
+            "c.shared.global.fastly.net:443",
+            "rg-video.ruangguru.com:443"
         ]
     },
     ...
+
+or
+
+    ./brainfuck-psiphon-pro-go -f c.shared.global.fastly.net:443,rg-video.ruangguru.com:443 -w fastly.net:443
+
+
+Note
+----
+
+- Use [bugscanner](https://github.com/aztecrabbit/bugscanner) to scan bugs for brainfuck psiphon pro go
 
