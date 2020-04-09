@@ -1,37 +1,37 @@
 package libpsiphon
 
 import (
+	"bufio"
+	"encoding/json"
+	"fmt"
 	"os"
 	"os/exec"
-	"fmt"
-	"time"
-	"bufio"
 	"strconv"
 	"strings"
-	"encoding/json"
+	"time"
 
 	"github.com/aztecrabbit/liblog"
-	"github.com/aztecrabbit/libutils"
 	"github.com/aztecrabbit/libproxyrotator"
+	"github.com/aztecrabbit/libutils"
 )
 
 var (
-	Loop = true
+	Loop          = true
 	DefaultConfig = &Config{
 		CoreName: "psiphon-tunnel-core",
-		Tunnel: 1,
-		Region: "",
+		Tunnel:   1,
+		Region:   "",
 		Protocols: []string{
 			"FRONTED-MEEK-HTTP-OSSH",
 			"FRONTED-MEEK-OSSH",
 		},
-		TunnelWorkers: 6,
+		TunnelWorkers:  6,
 		KuotaDataLimit: 4,
 		Authorizations: make([]string, 0),
 	}
 	DefaultKuotaData = &KuotaData{
 		Port: make(map[int]map[string]float64),
-		All: 0,
+		All:  0,
 	}
 	PsiphonDirectory = libutils.RealPath("storage/psiphon")
 )
@@ -45,48 +45,55 @@ func RemoveData() {
 }
 
 type Config struct {
-	CoreName string
-	Tunnel int
-	Region string
-	Protocols []string
-	TunnelWorkers int
+	CoreName       string
+	Tunnel         int
+	Region         string
+	Protocols      []string
+	TunnelWorkers  int
 	KuotaDataLimit int
 	Authorizations []string
 }
 
 type KuotaData struct {
 	Port map[int]map[string]float64
-	All float64
+	All  float64
 }
 
 type Data struct {
 	MigrateDataStoreDirectory string
-	UpstreamProxyURL string
-	LocalSocksProxyPort int
-	SponsorId string
-	PropagationChannelId string
-	EmitBytesTransferred bool
-	EmitDiagnosticNotices bool
-	DisableLocalHTTPProxy bool
-	EgressRegion string
-	TunnelPoolSize int
-	ConnectionWorkerPoolSize int
-	LimitTunnelProtocols []string
-	Authorizations []string
+	UpstreamProxyURL          string
+	LocalSocksProxyPort       int
+	SponsorId                 string
+	PropagationChannelId      string
+	EmitBytesTransferred      bool
+	EmitDiagnosticNotices     bool
+	DisableLocalHTTPProxy     bool
+	EgressRegion              string
+	TunnelPoolSize            int
+	ConnectionWorkerPoolSize  int
+	LimitTunnelProtocols      []string
+	Authorizations            []string
 }
 
 type Psiphon struct {
-	ProxyRotator *libproxyrotator.ProxyRotator
-	Config *Config
-	ProxyPort string
-	KuotaData *KuotaData
-	ListenPort int
+	ProxyRotator    *libproxyrotator.ProxyRotator
+	Config          *Config
+	ProxyPort       string
+	KuotaData       *KuotaData
+	ListenPort      int
 	TunnelConnected int
+	Verbose         bool
 }
 
 func (p *Psiphon) LogInfo(message string, color string) {
 	if Loop {
 		liblog.LogInfo(message, strconv.Itoa(p.ListenPort), color)
+	}
+}
+
+func (p *Psiphon) LogVerbose(message string, color string) {
+	if p.Verbose {
+		p.LogInfo(message, color)
 	}
 }
 
@@ -102,8 +109,8 @@ func (p *Psiphon) GetAuthorizations() []string {
 }
 
 func (p *Psiphon) CheckKuotaDataLimit(sent float64, received float64) bool {
-	if p.Config.KuotaDataLimit != 0 && int(p.KuotaData.Port[p.ListenPort]["all"]) >= (p.Config.KuotaDataLimit * 1000000) &&
-			int(sent) == 0 && int(received) <= 64000 {
+	if p.Config.KuotaDataLimit != 0 && int(p.KuotaData.Port[p.ListenPort]["all"]) >= (p.Config.KuotaDataLimit*1000000) &&
+		int(sent) == 0 && int(received) <= 64000 {
 		return false
 	}
 
@@ -113,26 +120,26 @@ func (p *Psiphon) CheckKuotaDataLimit(sent float64, received float64) bool {
 func (p *Psiphon) Start() {
 	PsiphonData := &Data{
 		MigrateDataStoreDirectory: PsiphonDirectory + "/data/" + strconv.Itoa(p.ListenPort),
-		UpstreamProxyURL: "http://127.0.0.1:" + p.ProxyPort,
-		LocalSocksProxyPort: p.ListenPort,
-		SponsorId: "0000000000000000",
-		PropagationChannelId: "0000000000000000",
-		EmitBytesTransferred: true,
-		EmitDiagnosticNotices: true,
-		DisableLocalHTTPProxy: true,
-		EgressRegion: strings.ToUpper(p.Config.Region),
-		TunnelPoolSize: p.Config.Tunnel,
-		ConnectionWorkerPoolSize: p.Config.TunnelWorkers,
-		LimitTunnelProtocols: p.Config.Protocols,
-		Authorizations: p.GetAuthorizations(),
+		UpstreamProxyURL:          "http://127.0.0.1:" + p.ProxyPort,
+		LocalSocksProxyPort:       p.ListenPort,
+		SponsorId:                 "0000000000000000",
+		PropagationChannelId:      "0000000000000000",
+		EmitBytesTransferred:      true,
+		EmitDiagnosticNotices:     true,
+		DisableLocalHTTPProxy:     true,
+		EgressRegion:              strings.ToUpper(p.Config.Region),
+		TunnelPoolSize:            p.Config.Tunnel,
+		ConnectionWorkerPoolSize:  p.Config.TunnelWorkers,
+		LimitTunnelProtocols:      p.Config.Protocols,
+		Authorizations:            p.GetAuthorizations(),
 	}
 
-	libutils.JsonWrite(PsiphonData, PsiphonData.MigrateDataStoreDirectory + "/config.json")
+	libutils.JsonWrite(PsiphonData, PsiphonData.MigrateDataStoreDirectory+"/config.json")
 
 	PsiphonFileBoltdb := PsiphonData.MigrateDataStoreDirectory + "/ca.psiphon.PsiphonTunnel.tunnel-core/datastore/psiphon.boltdb"
 	if _, err := os.Stat(PsiphonFileBoltdb); os.IsNotExist(err) {
 		libutils.CopyFile(
-			PsiphonDirectory + "/database/psiphon.boltdb", PsiphonFileBoltdb,
+			PsiphonDirectory+"/database/psiphon.boltdb", PsiphonFileBoltdb,
 		)
 	}
 
@@ -144,7 +151,7 @@ func (p *Psiphon) Start() {
 		p.TunnelConnected = 0
 
 		command := exec.Command(
-			libutils.RealPath(p.Config.CoreName), "-config", PsiphonData.MigrateDataStoreDirectory + "/config.json",
+			libutils.RealPath(p.Config.CoreName), "-config", PsiphonData.MigrateDataStoreDirectory+"/config.json",
 		)
 		command.Dir = PsiphonData.MigrateDataStoreDirectory
 
@@ -178,12 +185,12 @@ func (p *Psiphon) Start() {
 					}
 
 					liblog.LogReplace(fmt.Sprintf(
-							"%v (%v) (%v) (%v)",
-							p.ListenPort,
-							diagnosticId,
-							libutils.BytesToSize(p.KuotaData.Port[p.ListenPort][diagnosticId]),
-							libutils.BytesToSize(p.KuotaData.All),
-						),
+						"%v (%v) (%v) (%v)",
+						p.ListenPort,
+						diagnosticId,
+						libutils.BytesToSize(p.KuotaData.Port[p.ListenPort][diagnosticId]),
+						libutils.BytesToSize(p.KuotaData.All),
+					),
 						liblog.Colors["G1"],
 					)
 
@@ -204,41 +211,42 @@ func (p *Psiphon) Start() {
 					if strings.HasPrefix(message, "Config migration:") {
 						continue
 					} else if strings.Contains(message, "meek round trip failed") {
-						if p.Config.Tunnel == 1 && p.Config.Tunnel == p.TunnelConnected && (
-								message == "meek round trip failed: remote error: tls: bad record MAC" ||
-								message == "meek round trip failed: context deadline exceeded" ||
-								message == "meek round trip failed: EOF" ||
-								strings.Contains(message, "psiphon.CustomTLSDial")) {
+						if p.Config.Tunnel == 1 && p.Config.Tunnel == p.TunnelConnected && (message == "meek round trip failed: remote error: tls: bad record MAC" ||
+							message == "meek round trip failed: context deadline exceeded" ||
+							message == "meek round trip failed: EOF" ||
+							strings.Contains(message, "psiphon.CustomTLSDial")) {
 							break
 						}
 					} else if strings.Contains(message, "controller shutdown due to component failure") ||
-							strings.Contains(message, "psiphon.(*ServerContext).DoStatusRequest") ||
-							strings.Contains(message, "psiphon.(*Tunnel).sendSshKeepAlive") ||
-							strings.Contains(message, "psiphon.(*Tunnel).Activate") ||
-							strings.Contains(message, "underlying conn is closed") ||
-							strings.Contains(message, "duplicate tunnel:") ||
-							strings.Contains(message, "tunnel failed:") {
-						// p.LogInfo("Break: " + text, liblog.Colors["R1"])
+						strings.Contains(message, "psiphon.(*ServerContext).DoStatusRequest") ||
+						strings.Contains(message, "psiphon.(*Tunnel).sendSshKeepAlive") ||
+						strings.Contains(message, "psiphon.(*Tunnel).Activate") ||
+						strings.Contains(message, "underlying conn is closed") ||
+						strings.Contains(message, "duplicate tunnel:") ||
+						strings.Contains(message, "tunnel failed:") {
+						p.LogVerbose(text, liblog.Colors["R1"])
 						break
 					} else if strings.Contains(message, "A connection attempt failed because the connected party did not properly respond after a period of time") ||
-							strings.Contains(message, "No connection could be made because the target machine actively refused it") ||
-							strings.Contains(message, "HandleServerRequest for psiphon-alert failed") ||
-							strings.Contains(message, "tunnel.dialTunnel: dialConn is not a Closer") ||
-							strings.Contains(message, "psiphon.(*ServerContext).DoConnectedRequest") ||
-							strings.Contains(message, "making proxy request: unexpected EOF") ||
-							strings.Contains(message, "psiphon.(*MeekConn).readPayload") ||
-							strings.Contains(message, "response status: 403 Forbidden") ||
-							strings.Contains(message, "meek connection has closed") ||
-							strings.Contains(message, "meek connection is closed") ||
-							strings.Contains(message, "psiphon.(*MeekConn).relay") ||
-							strings.Contains(message, "unexpected status code:") ||
-							strings.Contains(message, "RemoteAddr returns nil") ||
-							strings.Contains(message, "network is unreachable") ||
-							strings.Contains(message, "close tunnel ssh error") ||
-							strings.Contains(message, "tactics request failed") ||
-							strings.Contains(message, "API request rejected") ||
-							strings.Contains(message, "context canceled") ||
-							strings.Contains(message, "no such host") {
+						strings.Contains(message, "No connection could be made because the target machine actively refused it") ||
+						strings.Contains(message, "HandleServerRequest for psiphon-alert failed") ||
+						strings.Contains(message, "SOCKS proxy accept error: socks5ReadCommand:") ||
+						strings.Contains(message, "tunnel.dialTunnel: dialConn is not a Closer") ||
+						strings.Contains(message, "psiphon.(*ServerContext).DoConnectedRequest") ||
+						strings.Contains(message, "making proxy request: unexpected EOF") ||
+						strings.Contains(message, "psiphon.(*MeekConn).readPayload") ||
+						strings.Contains(message, "response status: 403 Forbidden") ||
+						strings.Contains(message, "meek connection has closed") ||
+						strings.Contains(message, "meek connection is closed") ||
+						strings.Contains(message, "psiphon.(*MeekConn).relay") ||
+						strings.Contains(message, "unexpected status code:") ||
+						strings.Contains(message, "RemoteAddr returns nil") ||
+						strings.Contains(message, "network is unreachable") ||
+						strings.Contains(message, "close tunnel ssh error") ||
+						strings.Contains(message, "tactics request failed") ||
+						strings.Contains(message, "API request rejected") ||
+						strings.Contains(message, "context canceled") ||
+						strings.Contains(message, "no such host") {
+						p.LogVerbose(message, liblog.Colors["CC"])
 						continue
 					} else if strings.Contains(message, "bind: address already in use") {
 						p.LogInfo("Port already in use", liblog.Colors["R1"])
@@ -251,7 +259,7 @@ func (p *Psiphon) Start() {
 					continue
 
 				} else {
-					// liblog.LogInfoSplit(text, 22, "INFO", liblog.Colors["G2"])
+					// p.LogVerbose(text, liblog.Colors["CC"])
 
 				}
 			}
