@@ -93,7 +93,7 @@ func (p *Psiphon) LogInfo(message string, color string) {
 
 func (p *Psiphon) LogVerbose(message string, color string) {
 	if p.Verbose {
-		p.LogInfo(message, color)
+		p.LogInfo(fmt.Sprintf("%[1]sVERBOSE%[3]s %[2]s::%[3]s %[1]s", color, liblog.Colors["P1"], liblog.Colors["CC"])+message, color)
 	}
 }
 
@@ -184,13 +184,14 @@ func (p *Psiphon) Start() {
 						break
 					}
 
-					liblog.LogReplace(fmt.Sprintf(
-						"%v (%v) (%v) (%v)",
-						p.ListenPort,
-						diagnosticId,
-						libutils.BytesToSize(p.KuotaData.Port[p.ListenPort][diagnosticId]),
-						libutils.BytesToSize(p.KuotaData.All),
-					),
+					liblog.LogReplace(
+						fmt.Sprintf(
+							"%v (%v) (%v) (%v)",
+							p.ListenPort,
+							diagnosticId,
+							libutils.BytesToSize(p.KuotaData.Port[p.ListenPort][diagnosticId]),
+							libutils.BytesToSize(p.KuotaData.All),
+						),
 						liblog.Colors["G1"],
 					)
 
@@ -215,6 +216,7 @@ func (p *Psiphon) Start() {
 							message == "meek round trip failed: context deadline exceeded" ||
 							message == "meek round trip failed: EOF" ||
 							strings.Contains(message, "psiphon.CustomTLSDial")) {
+							p.LogVerbose(text, liblog.Colors["R1"])
 							break
 						}
 					} else if strings.Contains(message, "controller shutdown due to component failure") ||
@@ -246,7 +248,7 @@ func (p *Psiphon) Start() {
 						strings.Contains(message, "API request rejected") ||
 						strings.Contains(message, "context canceled") ||
 						strings.Contains(message, "no such host") {
-						p.LogVerbose(message, liblog.Colors["CC"])
+						p.LogVerbose(message, liblog.Colors["G2"])
 						continue
 					} else if strings.Contains(message, "bind: address already in use") {
 						p.LogInfo("Port already in use", liblog.Colors["R1"])
@@ -255,11 +257,15 @@ func (p *Psiphon) Start() {
 						p.LogInfo(text, liblog.Colors["R1"])
 					}
 
+				} else if noticeType == "LocalProxyError" {
+					p.LogVerbose(text, liblog.Colors["R1"])
+					break
+
 				} else if noticeType == "UpstreamProxyError" {
 					continue
 
 				} else {
-					// p.LogVerbose(text, liblog.Colors["CC"])
+					p.LogVerbose(text, liblog.Colors["CC"])
 
 				}
 			}

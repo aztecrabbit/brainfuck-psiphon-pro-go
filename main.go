@@ -138,12 +138,14 @@ func main() {
 	liblog.LogInfo("Proxy Rotator running on port "+ProxyRotator.Config.Port, "INFO", liblog.Colors["G1"])
 
 	if _, err := os.Stat(libutils.RealPath(config.Psiphon.CoreName)); os.IsNotExist(err) {
-		liblog.LogInfo(fmt.Sprintf(
-			"Exception:\n\n"+
-				"|	 File '%s' not exist!\n"+
-				"|	 Exiting...\n"+
-				"|\n",
-			config.Psiphon.CoreName),
+		liblog.LogInfo(
+			fmt.Sprintf(
+				"Exception:\n\n"+
+					"|	 File '%s' not exist!\n"+
+					"|	 Exiting...\n"+
+					"|\n",
+				config.Psiphon.CoreName,
+			),
 			"INFO", liblog.Colors["R1"],
 		)
 		return
