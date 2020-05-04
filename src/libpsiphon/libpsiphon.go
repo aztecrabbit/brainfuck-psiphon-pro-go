@@ -258,8 +258,7 @@ func (p *Psiphon) Start() {
 					}
 
 				} else if noticeType == "LocalProxyError" {
-					p.LogVerbose(text, liblog.Colors["R1"])
-					break
+					continue
 
 				} else if noticeType == "UpstreamProxyError" {
 					continue
