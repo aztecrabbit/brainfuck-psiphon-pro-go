@@ -19,7 +19,7 @@ import (
 const (
 	appName        = "Brainfuck Tunnel"
 	appVersionName = "Psiphon Pro Go"
-	appVersionCode = "1.3.200205"
+	appVersionCode = "1.3.200512"
 
 	copyrightYear   = "2020"
 	copyrightAuthor = "Aztec Rabbit"
