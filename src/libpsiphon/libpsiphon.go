@@ -33,7 +33,7 @@ var (
 		Port: make(map[int]map[string]float64),
 		All:  0,
 	}
-	PsiphonDirectory = libutils.RealPath("storage/psiphon")
+	ConfigPathPsiphon = libutils.GetConfigPath("brainfuck-psiphon-pro-go", "storage/psiphon")
 )
 
 func Stop() {
@@ -41,7 +41,7 @@ func Stop() {
 }
 
 func RemoveData() {
-	os.RemoveAll(PsiphonDirectory + "/data")
+	os.RemoveAll(ConfigPathPsiphon + "/data")
 }
 
 type Config struct {
@@ -119,7 +119,7 @@ func (p *Psiphon) CheckKuotaDataLimit(sent float64, received float64) bool {
 
 func (p *Psiphon) Start() {
 	PsiphonData := &Data{
-		MigrateDataStoreDirectory: PsiphonDirectory + "/data/" + strconv.Itoa(p.ListenPort),
+		MigrateDataStoreDirectory: ConfigPathPsiphon + "/data/" + strconv.Itoa(p.ListenPort),
 		UpstreamProxyURL:          "http://127.0.0.1:" + p.ProxyPort,
 		LocalSocksProxyPort:       p.ListenPort,
 		SponsorId:                 "0000000000000000",
@@ -139,7 +139,7 @@ func (p *Psiphon) Start() {
 	PsiphonFileBoltdb := PsiphonData.MigrateDataStoreDirectory + "/ca.psiphon.PsiphonTunnel.tunnel-core/datastore/psiphon.boltdb"
 	if _, err := os.Stat(PsiphonFileBoltdb); os.IsNotExist(err) {
 		libutils.CopyFile(
-			PsiphonDirectory+"/database/psiphon.boltdb", PsiphonFileBoltdb,
+			libutils.RealPath("/storage/psiphon/database/psiphon.boltdb"), PsiphonFileBoltdb,
 		)
 	}
 
@@ -172,11 +172,11 @@ func (p *Psiphon) Start() {
 
 				if noticeType == "BytesTransferred" {
 					data := line["data"].(map[string]interface{})
-					diagnosticId := data["diagnosticID"].(string)
+					diagnosticID := data["diagnosticID"].(string)
 					sent := data["sent"].(float64)
 					received := data["received"].(float64)
 
-					p.KuotaData.Port[p.ListenPort][diagnosticId] += sent + received
+					p.KuotaData.Port[p.ListenPort][diagnosticID] += sent + received
 					p.KuotaData.Port[p.ListenPort]["all"] += sent + received
 					p.KuotaData.All += sent + received
 
@@ -188,8 +188,8 @@ func (p *Psiphon) Start() {
 						fmt.Sprintf(
 							"%v (%v) (%v) (%v)",
 							p.ListenPort,
-							diagnosticId,
-							libutils.BytesToSize(p.KuotaData.Port[p.ListenPort][diagnosticId]),
+							diagnosticID,
+							libutils.BytesToSize(p.KuotaData.Port[p.ListenPort][diagnosticID]),
 							libutils.BytesToSize(p.KuotaData.All),
 						),
 						liblog.Colors["G1"],
@@ -199,8 +199,8 @@ func (p *Psiphon) Start() {
 					p.ProxyRotator.AddProxy("0.0.0.0:" + strconv.Itoa(p.ListenPort))
 					p.TunnelConnected++
 					if p.Config.Tunnel > 1 {
-						diagnosticId := line["data"].(map[string]interface{})["diagnosticID"].(string)
-						p.LogInfo(fmt.Sprintf("Connected (%s)", diagnosticId), liblog.Colors["Y1"])
+						diagnosticID := line["data"].(map[string]interface{})["diagnosticID"].(string)
+						p.LogInfo(fmt.Sprintf("Connected (%s)", diagnosticID), liblog.Colors["Y1"])
 					}
 					if p.TunnelConnected == p.Config.Tunnel {
 						p.LogInfo("Connected", liblog.Colors["Y1"])

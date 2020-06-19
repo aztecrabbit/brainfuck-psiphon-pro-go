@@ -26,6 +26,10 @@ Requirements
 Install
 -------
 
+**AUR**
+
+    $ yay -S brainfuck-psiphon-pro-go-bin
+
 **Brainfuck Psiphon Pro Go**
 
     $ go get -v -u -d github.com/aztecrabbit/brainfuck-psiphon-pro-go

@@ -19,7 +19,7 @@ import (
 const (
 	appName        = "Brainfuck Tunnel"
 	appVersionName = "Psiphon Pro Go"
-	appVersionCode = "1.3.200512"
+	appVersionCode = "1.3.200619"
 
 	copyrightYear   = "2020"
 	copyrightAuthor = "Aztec Rabbit"
@@ -44,6 +44,10 @@ func init() {
 		liblog.LogKeyboardInterrupt()
 	}
 	InterruptHandler.Start()
+}
+
+func GetConfigPath(filename string) string {
+	return libutils.GetConfigPath("brainfuck-psiphon-pro-go", filename)
 }
 
 func main() {
@@ -81,7 +85,7 @@ func main() {
 		defaultConfig.Psiphon.CoreName += ".exe"
 	}
 
-	libutils.JsonReadWrite(libutils.RealPath("config.json"), config, defaultConfig)
+	libutils.JsonReadWrite(GetConfigPath("config.json"), config, defaultConfig)
 
 	var flagPro = true
 	var flagRefresh = false
@@ -153,6 +157,8 @@ func main() {
 	}
 
 	Redsocks.Config = libredsocks.DefaultConfig
+	Redsocks.Config.LogOutput = GetConfigPath("redsocks.log")
+	Redsocks.Config.ConfigOutput = GetConfigPath("redsocks.conf")
 	Redsocks.Start()
 
 	for i := 1; i <= config.PsiphonCore; i++ {
