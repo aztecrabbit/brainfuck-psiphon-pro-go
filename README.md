@@ -68,7 +68,8 @@ Configurations
 --------------
 
 Run `./brainfuck-psiphon-pro-go` first to export all default settings.
-Config will generated to `config.json` where `brainfuck-psiphon-pro-go` binary file are executed.
+Config will generated to `config.json` where `brainfuck-psiphon-pro-go` binary file are executed. or in linux
+`~/.config/brainfuck-psiphon-pro-go`
 
 
 ### Pro Version
@@ -185,4 +186,3 @@ Note
 ----
 
 - Use [bugscanner](https://github.com/aztecrabbit/bugscanner) to scan bugs for brainfuck psiphon pro go
-

@@ -122,8 +122,8 @@ func (p *Psiphon) Start() {
 		MigrateDataStoreDirectory: ConfigPathPsiphon + "/data/" + strconv.Itoa(p.ListenPort),
 		UpstreamProxyURL:          "http://127.0.0.1:" + p.ProxyPort,
 		LocalSocksProxyPort:       p.ListenPort,
-		SponsorId:                 "0000000000000000",
-		PropagationChannelId:      "0000000000000000",
+		SponsorId:                 "00000000000000FF",
+		PropagationChannelId:      "00000000000000FF",
 		EmitBytesTransferred:      true,
 		EmitDiagnosticNotices:     true,
 		DisableLocalHTTPProxy:     true,
@@ -206,7 +206,7 @@ func (p *Psiphon) Start() {
 						p.LogInfo("Connected", liblog.Colors["Y1"])
 					}
 
-				} else if noticeType == "Alert" {
+				} else if noticeType == "Alert" || noticeType == "Warning" {
 					message := line["data"].(map[string]interface{})["message"].(string)
 
 					if strings.HasPrefix(message, "Config migration:") {
@@ -220,7 +220,7 @@ func (p *Psiphon) Start() {
 							break
 						}
 					} else if strings.Contains(message, "controller shutdown due to component failure") ||
-						strings.Contains(message, "psiphon.(*ServerContext).DoStatusRequest") ||
+						strings.Contains(message, "psiphon.(*ServerContext).DoConnectedRequest") ||
 						strings.Contains(message, "psiphon.(*Tunnel).sendSshKeepAlive") ||
 						strings.Contains(message, "psiphon.(*Tunnel).Activate") ||
 						strings.Contains(message, "underlying conn is closed") ||
@@ -233,7 +233,6 @@ func (p *Psiphon) Start() {
 						strings.Contains(message, "HandleServerRequest for psiphon-alert failed") ||
 						strings.Contains(message, "SOCKS proxy accept error: socks5ReadCommand:") ||
 						strings.Contains(message, "tunnel.dialTunnel: dialConn is not a Closer") ||
-						strings.Contains(message, "psiphon.(*ServerContext).DoConnectedRequest") ||
 						strings.Contains(message, "making proxy request: unexpected EOF") ||
 						strings.Contains(message, "psiphon.(*MeekConn).readPayload") ||
 						strings.Contains(message, "response status: 403 Forbidden") ||
